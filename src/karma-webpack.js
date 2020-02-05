@@ -356,7 +356,9 @@ Plugin.prototype.readFile = function(file, callback) {
     } else {
       try {
         const fileContents = middleware.fileSystem.readFileSync(
-          path.join(os.tmpdir(), '_karma_webpack_', this.outputs.get(file))
+          path.isAbsolute(file)
+						? file
+						: path.join(os.tmpdir(), '_karma_webpack_', this.outputs.get(file))
         );
 
         callback(null, fileContents);
@@ -408,7 +410,9 @@ function createPreprocesor(/* config.basePath */ basePath, webpackPlugin) {
       const outputPath = webpackPlugin.outputs.get(
         normalize(filename.replace(/\\/g, '/'))
       );
-      file.path = normalize(path.join(basePath, outputPath));
+      file.path = path.isAbsolute(outputPath)
+				? normalize(outputPath)
+				: normalize(path.join(basePath, outputPath));
 
       done(err, content && content.toString());
     });
